@@ -13,7 +13,7 @@ services:
 
   api:
     build: ./backend
-    commands: uvicorn main:app --host 0.0.0.0 --port 8000
+    commands: uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
     volumes:
       - shared_data:/app/data
     ports:
