@@ -1,36 +1,47 @@
 services:
-
   redis:
     image: redis:7-alpine
-    heathcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+    container_name: mubadal-redis
     ports:
       - "6379:6379"
+    restart: unless-stopped
 
-
-  api:
+  backend:
     build: ./backend
-    commands: uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
-    volumes:
-      - shared_data:/app/data
+    container_name: mubadal-backend
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
+    volumes:
+      - shared-uploads:/tmp/mubadal_uploads
+    environment:
+      - PYTHONUNBUFFERED=1
+      - REDIS_URL=redis://redis:6379/0
     depends_on:
-      redis:
-        condition: service_healthy
+      - redis
+    restart: unless-stopped
 
-  worker:
+  celery-worker:
     build: ./backend
-    command: celery -A tasks worker --loglevel=info
-    volume:
-      - shared_data:/app/data
-
+    container_name: mubadal-worker
+    command: celery -A celery_app.celery worker --loglevel=info --concurrency=4
+    volumes:
+      - shared-uploads:/tmp/mubadal_uploads
+    environment:
+      - PYTHONUNBUFFERED=1
+      - REDIS_URL=redis://redis:6379/0
     depends_on:
-      redis:
-        condition: service_healthy
+      - redis
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: mubadal-frontend
+    ports:
+      - "4000:4000"
+    depends_on:
+      - backend
+    restart: unless-stopped
 
 volumes:
-  shared_data:
+  shared-uploads:
