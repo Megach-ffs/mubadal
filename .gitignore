@@ -1,30 +1,27 @@
-# Python
+# Dependencies
+node_modules/
+venv/
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-*.egg-info/
-*.egg
+*.pyc
+*.pyo
+
+# Build output
 dist/
 build/
-*.whl
+.svelte-kit/
 
-# Virtual Environment
-venv/
-env/
-.venv/
-.env/
-
-# Vim
+# Temp / editor files
 *.swp
 *.swo
-*.un~
 *~
+*.un~
+.DS_Store
+Thumbs.db
 
-# IDE
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
+# Environment
+.env
+.env.*
 
-
+# Uploads / temp
+uploads/
+tmp/
